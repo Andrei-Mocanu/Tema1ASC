@@ -1,0 +1,64 @@
+Andrei Cristian Mocanu
+335CC
+
+Tema 1
+
+Organizare
+
+Tema este compusa din:
+
+* 4 fisiere sursa:
+- consumer.py (implementarea consumerului)
+- producer.py (implentarea producerului)
+- marketplace.py (implentarea marketplacelui)
+- product.py
+
+Consumerul incearca sa execute ce le 2 operatii posibile de
+adaugare in cos si de scoatere din cos. Daca esueaza cea de adaugare 
+va reincerca pana cand are in cos cantitatea dorita din acel produs.
+
+Producerul produce intr-o bucla infinita pana cand atinge cantitatea
+maxima din fiecare produs si dupa reintializeaza cantitatea produsa la 
+0 si incepe din nou sa produca.
+
+Marketplace face interfatarea intre producer si consumer punand la 
+dispozitie functiile de publish add_to_cart si remove_from_cart
+producatorilor si consumatorilor.
+
+Implementare
+
+Consumer:
+
+Itereaza prin cosurile de cumparaturi si pentru fiecare operatie
+in functie de tipul ei apeleazea metoda corespunzatoare din marketplace.
+In cazul metodei add daca operatia nu s-a executat cu succes consumatorul 
+o sa astepte un timp egal cu durata specificata in fisierul de intrare.
+Dupa ce executa toate operatiile cu succes se va apela metoda place_order
+din marketplace ce va afisa continutul cosului de cumparaturi.
+
+Producer:
+
+Intr-o bucla infinita producatorul parcurge lista de produse
+si apeleaza metoda publish din marketplace daca aceasta metoda
+intoarce fals el va da sleep cu durata de republish time , altfel
+daca reuseste va da sleep cu valoarea asociata produsului.
+
+Marketplace:
+
+Pentru setarea idurilor producatorilor si carturilor folosesc un Lock
+pentru fiecare incrementare a idurilor acestora in functiile register_producere
+si new_cart.
+Pentru a avea evidenta produselor disponibile in marketplace am o lista. Pentru
+a stii dimensiunea cozii fiecarui producator am un dictionar producer_queues.
+Pentru a avea in evidenta ce produse a publicat fiecare producator am un dictionar
+producer_products. Mai folosesc si un dictionar in care cheia e idul cartului si
+valoarea este o lista cu produsele ce sunt in cart.
+
+Functiile add_to_cart si remove_from_cart folosesc un lock add_remove_lock pentru 
+a lasa doar un consumator sa faca operatii pe lista de produse sau pe dictionarele
+ce reprezinta produsele date de producatori.
+
+Functia place intoarce lista cu produse dintr-un anumit cart care o sa fie afisata 
+in consumer dupa ce se realizaza toate operatiile acestuia.
+
+Am implemtat toate cerintele temei.
