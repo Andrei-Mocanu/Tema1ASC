@@ -42,10 +42,9 @@ class Producer(Thread):
         while True:
             for product in self.products:
                 quantity = 0
-                #print("nr = " + str(product[0]))
                 while quantity < product[1]:
                     if self.marketplace.publish(str(self.producerID), product[0]):
-                        time.sleep(product[2])
-                        quantity += 1
+                        time.sleep(product[2])                     #produce pana se atinge
+                        quantity += 1                              #cantiatea necesara
                     else:
                         time.sleep(self.republish_wait_time)

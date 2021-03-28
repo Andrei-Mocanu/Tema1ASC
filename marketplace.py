@@ -5,7 +5,7 @@ Computer Systems Architecture Course
 Assignment 1
 March 2021
 """
-from threading import currentThread, Lock
+from threading import  Lock
 
 class Marketplace:
     """
@@ -28,7 +28,7 @@ class Marketplace:
         self.products_in_marketplace = []
         self.producers_queues = {}
         self.producers_products = {}
-        self.add_lock = Lock()
+        self.add_remove_lock = Lock()
 
     def register_producer(self):
         """
@@ -36,11 +36,12 @@ class Marketplace:
         """
 
         self.id_producer_lock.acquire()
-        self.id_producer += 1
+        self.id_producer += 1               #inregistreaza producatorul
         self.id_producer_lock.release()
 
-        self.producers_products[self.id_producer] = []
-        self.producers_queues[self.id_producer] = 0
+        self.producers_products[self.id_producer] = []     #initiliazieaza lista de produse
+        self.producers_queues[self.id_producer] = 0        #initiliazieaza coada
+
         return self.id_producer
 
     def publish(self, producer_id, product):
@@ -56,12 +57,11 @@ class Marketplace:
         :returns True or False. If the caller receives False, it should wait and then try again.
         """
 
-        #print(self.producers_queues[int(producer_id)])
         if not self.producers_queues[int(producer_id)] < self.queue_size_per_producer:
             return False
 
         self.producers_queues[int(producer_id)] += 1
-        self.products_in_marketplace.append(product)
+        self.products_in_marketplace.append(product)                   #adauga produsul in market
         self.producers_products[int(producer_id)].append(product)
 
         return True
@@ -74,7 +74,7 @@ class Marketplace:
         """
 
         self.id_carts_lock.acquire()
-        self.id_cart += 1
+        self.id_cart += 1                       #initializeaza cartul
         self.id_carts_lock.release()
         self.all_carts[self.id_cart] = []
 
@@ -94,14 +94,14 @@ class Marketplace:
         """
 
 
-        with self.add_lock:
+        with self.add_remove_lock:
             if product not in self.products_in_marketplace:
                 return False
             self.products_in_marketplace.remove(product)
             for producer in self.producers_products:
-                if product in self.producers_products[producer]:
-                    self.producers_queues[producer] -= 1
-                    self.producers_products[producer].remove(product)
+                if product in self.producers_products[producer]:            #adauga in cart primul element
+                    self.producers_queues[producer] -= 1                    #de tipul specificat din dictionarul
+                    self.producers_products[producer].remove(product)       #de producatori
                     break
 
         self.all_carts[cart_id].append(product)
@@ -120,12 +120,12 @@ class Marketplace:
 
         self.all_carts[cart_id].remove(product)
 
-        with self.add_lock:
+        with self.add_remove_lock:
             self.products_in_marketplace.append(product)
             for producer in self.producers_products:
-                if product in self.producers_products[producer]:
-                    self.producers_queues[producer] += 1
-                    self.producers_products[producer].append(product)
+                if product in self.producers_products[producer]:        #scoate din cart produsul
+                    self.producers_queues[producer] += 1                #dat ca parametru din dictionarul
+                    self.producers_products[producer].append(product)   #de produse
                     break
 
 
@@ -137,5 +137,4 @@ class Marketplace:
         :param cart_id: id cart
         """
 
-        for product in self.all_carts[cart_id]:
-            print(currentThread().getName() + " bought " + str(product))
+        return self.all_carts[cart_id]                             #intoarce lista cu elemente din cart

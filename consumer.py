@@ -6,7 +6,7 @@ Assignment 1
 March 2021
 """
 
-from threading import Thread
+from threading import Thread, currentThread
 import time
 
 class Consumer(Thread):
@@ -45,11 +45,13 @@ class Consumer(Thread):
                 while op_count < operation['quantity']:
                     if operation['type'] == 'add':
                         if self.marketplace.add_to_cart(id_cart, operation['product']) is False:
-                            time.sleep(self.retry_wait_time)
+                            time.sleep(self.retry_wait_time)        #reincearca pana reusesc toate operatiile
                         else:
                             op_count += 1
                     elif operation['type'] == 'remove':
                         self.marketplace.remove_from_cart(id_cart, operation['product'])
                         op_count += 1
 
-            self.marketplace.place_order(id_cart)
+            products_in_cart = self.marketplace.place_order(id_cart)
+            for product in products_in_cart:                               #afiseaza produsele din cart
+                print(currentThread().getName() + " bought " + str(product))
